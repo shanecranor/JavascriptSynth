@@ -2,8 +2,8 @@ let audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 let masterLevel = audioCtx.createGain();
 masterLevel.connect(audioCtx.destination)
 let oscs = []
-createOsc('square', 33.7,	1.0)
-createOsc('square', 33.7*2,	1.0)
+createOsc('square', 33.7,	.5)
+createOsc('square', 33.7*2,	.5)
 function createOsc(oscType, freq, gain){
 	oscs.push([audioCtx.createOscillator(), audioCtx.createGain()])
 	oscs[oscs.length-1][0].type = oscType
