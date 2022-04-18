@@ -1,7 +1,9 @@
 keyMap = new Object()
 let audioStarted = false
+let t = 0
 document.onkeydown = function (e) {
-	//audioCtx.resume()
+	if(keyNoteMap[e.key] == null)
+		return
 	if(!keyMap[e.key] || !keyMap[e.key].pressed){
     	keyMap[e.key] = {pressed: true, time: performance.now()};
 		key = keyNoteMap[e.key]-9-24
@@ -19,6 +21,8 @@ document.onkeydown = function (e) {
 }
 
 document.onkeyup = function (e) {
+	if(keyNoteMap[e.key] == null)
+		return
     keyMap[e.key] = {pressed: false, time: performance.now()};
 	let keysDown = 0
 	for ( key in keyMap ){
@@ -83,8 +87,8 @@ masterLevel.connect(audioCtx.destination)
 let oscs = []
 let key = 5
 let note = eval(noteEquation.value)
-createOsc(waveforms[2], 'note',	.2)
-createOsc(waveforms[0], 'note*4',	.2)
+createOsc(waveforms[3], 'note*2',	.2)
+createOsc(waveforms[3], 'note*4+sin(t)',	.2)
 console.log(waveforms)
 function createOsc(wave, freqEquation, gain){
 	let volNode = audioCtx.createGain()
@@ -104,12 +108,12 @@ function createOsc(wave, freqEquation, gain){
 	let oscAmp = createElement('input', {
 		class: 'amplitude',
  		type: 'range',
-		min: 0, max: 100, value: 50
+		min: 0, max: 100, value: gain*100
 	})
 	let oscType = createElement('input', {
 		class: 'type',
  		type: 'range',
-		min: 0, max: 3, value: 50
+		min: 0, max: 3, value: 3
 	})
 	let oscPitch = createElement('input', {
 		class: 'pitch',
@@ -167,7 +171,6 @@ masterVol.addEventListener('input', () => changeVolume(masterVol))
 function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
-t = 0
 function sin(x){
 	return Math.sin(x)
 }
