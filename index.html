@@ -5,16 +5,20 @@
 <link type="text/css" rel="stylesheet" href="styles/index.css">
 </head>
 <body>
-	<h1>Synth Boi</h1>
+	<h1>Synth Boi (monophonic)</h1>
 	Master Volume
 	<input id="masterVol" type="range" min=0 max=100 value=0.5 />
-	Oscillator Amplitude
-	<input id="amplitude" type="range" min=0 max=100 value=40 />
-	Oscillator Pitch
-	<input id="pitch" type="range" min=1 max=1000 />
+	Note Equation
+	<input id="noteEquation" type="text"/>
 	<div id="oscControls">
-		
+		<p>OSC | ------AMPLITUDE------ | ------WAVEFORM------ |-FREQ EQUATION- | FREQ DISPLAY</p>
 	</div>
+	<button onclick="createOsc(waveforms[0], 'note',	.2)" >New OSC</button>
 	<script type="text/javascript" src="index.js"></script>
+	<h3>Instructions:</h3>
+	<p>
+		press the keys on the home row of your keyboard to make sound! <br>
+		type 'note' in the freq equation to generate in tune notes. want to go up an octave? type note*2, want to add some vibrato? try note + sin(t)
+	</p>
 </body>
 </html> 
