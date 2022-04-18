@@ -1,15 +1,20 @@
 keyMap = new Object()
-
+let audioStarted = false
 document.onkeydown = function (e) {
+	//audioCtx.resume()
 	if(!keyMap[e.key] || !keyMap[e.key].pressed){
     	keyMap[e.key] = {pressed: true, time: performance.now()};
 		key = keyNoteMap[e.key]-9-24
 		note = eval(noteEquation.value)
 		for ( i in oscs ){
+			if(!audioStarted){
+				oscs[i][0].start()
+			}
 			let newPitch = eval(oscs[i][2])
 			oscs[i][0].frequency.value = newPitch
 			oscs[i][0].connect(oscs[i][1])
 		}
+		audioStarted = true
 	}
 }
 
@@ -89,7 +94,6 @@ function createOsc(wave, freqEquation, gain){
 	//oscs[oscs.length-1][0].connect(oscs[oscs.length-1][1])
 	oscs[oscs.length-1][1].gain.value = gain
 	oscs[oscs.length-1][1].connect(masterLevel)
-	oscs[oscs.length-1][0].start()
 	let oscContainer = createElement('div', {
 		id: 'osc' + (oscs.length-1) + 'Container'
 	})
