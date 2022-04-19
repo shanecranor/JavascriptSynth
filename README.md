@@ -18,7 +18,6 @@ A (mostly) fully featured synthesizer built using the webaudio API
 ## Potential Future Directions:
 
 //easy:
-
 - Add filters (lowpass, highpass, bandpass)
 - Add distortion and other effects
   - Add effects array and allow chaining
@@ -30,6 +29,7 @@ A (mostly) fully featured synthesizer built using the webaudio API
 - Export recorded audio
 - Hook up output of osc as a variable to another osc
 - Make ADSR
+
 //Difficult
 - Polyphonic synth
 - Parametric EQ with cute interface
@@ -38,5 +38,4 @@ A (mostly) fully featured synthesizer built using the webaudio API
   - IE an OSC block with a note and amplitude input would have two text fields and by default, the note field would contain noteIn and the amplitude field would contain volIn
   - There will be an option to add input pipes and rename them.
   -  Potentially a way to have default values for input pipes if nothing is connected to them
-    
-Custom waveforms built outside of web audio api OSC object?
+  -  Custom waveforms built outside of web audio api OSC object?
