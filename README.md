@@ -14,7 +14,8 @@ A (mostly) fully featured synthesizer built using the webaudio API, chceck out t
   - all operators work mostly as expected + - / * %
   - Javascript functions work like Math.tan()
   
-  
+## TODO
+- swap eval out with new Function for over 1000x performance speed up
 ## Potential Future Directions:
 
 //easy:
