@@ -1,5 +1,5 @@
 # JavascriptSynth
-A (mostly) fully featured synthesizer built using the webaudio API, chceck out the live page at https://shane.cranor.org/synth !
+A (mostly) fully featured synthesizer built using the webaudio API, check out the live page at https://shane.cranor.org/synth !
 ## Current Features
 - Infinite OSCs
 - 4 waveforms, sin, triangle, sawtooth, square
