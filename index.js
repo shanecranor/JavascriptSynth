@@ -10,11 +10,11 @@ document.onkeydown = function (e) {
 		note = eval(noteEquation.value)
 		for ( i in oscs ){
 			if(!audioStarted){
-				oscs[i][0].start()
+				oscs[i].osc.start()
 			}
-			let newPitch = eval(oscs[i][2])
-			oscs[i][0].frequency.value = newPitch
-			oscs[i][0].connect(oscs[i][1])
+			let newPitch = oscs[i].freqFunction(note)
+			oscs[i].osc.frequency.setValueAtTime(newPitch, audioCtx.currentTime)
+			oscs[i].osc.connect(oscs[i].vol)
 		}
 		audioStarted = true
 	}
@@ -32,7 +32,7 @@ document.onkeyup = function (e) {
 	}
 	if (keysDown == 0){
 		for ( i in oscs ){
-			oscs[i][0].disconnect()
+			oscs[i].osc.disconnect()
 		}
 	}
 }
@@ -79,6 +79,11 @@ let waveforms = {
 	2: 'sawtooth',
 	3: 'square'
 }
+
+function generateFunction(string) {
+    return new Function("note", 'return ' + string)
+}
+
 noteEquation = document.getElementById('noteEquation')
 noteEquation.value = '440*pow(pow(2, 1/12), key)'
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)()
@@ -87,17 +92,24 @@ masterLevel.connect(audioCtx.destination)
 let oscs = []
 let key = 5
 let note = eval(noteEquation.value)
-createOsc(waveforms[3], 'note*2',	.2)
-createOsc(waveforms[3], 'note*4+sin(t)',	.2)
+createOsc(waveforms[3], 'note*4',	.2)
+createOsc(waveforms[3], 'note*floor(tan(t*100))',	.2)
+createOsc(waveforms[3], 'note*4*(floor(t*10)%5)',	0.0)
 console.log(waveforms)
 function createOsc(wave, freqEquation, gain){
 	let volNode = audioCtx.createGain()
-	oscs.push([audioCtx.createOscillator(), volNode, freqEquation])
-	oscs[oscs.length-1][0].type = wave
-	oscs[oscs.length-1][0].frequency.value = eval(freqEquation)
-	//oscs[oscs.length-1][0].connect(oscs[oscs.length-1][1])
-	oscs[oscs.length-1][1].gain.value = gain
-	oscs[oscs.length-1][1].connect(masterLevel)
+	let oscNode = {
+		osc:			audioCtx.createOscillator(), 
+		vol:			volNode,
+		freqText:		freqEquation, 
+		freqFunction:	generateFunction(freqEquation)
+	}
+	oscs.push(oscNode)
+	oscs[oscs.length-1].osc.type = wave
+	oscs[oscs.length-1].osc.frequency.value = eval(freqEquation)
+	//oscs[oscs.length-1].osc.connect(oscs[oscs.length-1].vol)
+	oscs[oscs.length-1].vol.gain.value = gain
+	oscs[oscs.length-1].vol.connect(masterLevel)
 	let oscContainer = createElement('div', {
 		id: 'osc' + (oscs.length-1) + 'Container'
 	})
@@ -135,7 +147,7 @@ function createOsc(wave, freqEquation, gain){
 	oscContainer.appendChild(oscPitch)
 	oscPitch.addEventListener('input', () => changeOscPitch(oscContainer))
 
-	oscPitchVal.innerText = oscs[oscs.length-1][0].frequency.value
+	oscPitchVal.innerText = oscs[oscs.length-1].osc.frequency.value
 	oscContainer.appendChild(oscPitchVal)
 	document.getElementById('oscControls').appendChild(oscContainer)
 }
@@ -148,20 +160,21 @@ const changeVolume = function(slider) {
 const changeOscAmp = function(container) {
 	slider = container.querySelector('.amplitude')
 	oscIndex = container.id[3]
-	oscs[oscIndex][1].gain.value =  slider.value / 100
+	oscs[oscIndex].vol.gain.value =  slider.value / 100
 }
 
 const changeOscType = function(container) {
 	slider = container.querySelector('.type')
 	oscIndex = container.id[3]
-	oscs[oscIndex][0].type =  waveforms[slider.value]
+	oscs[oscIndex].osc.type =  waveforms[slider.value]
 }
 
 const changeOscPitch = function(container) {
 	input = container.querySelector('.pitch')
 	oscIndex = container.id[3]
-	oscs[oscIndex][2] = input.value
-	//oscs[oscIndex][0].frequency.value = freq
+	oscs[oscIndex].freqText = input.value
+	oscs[oscIndex].freqFunction = generateFunction(oscs[oscIndex].freqText)
+	//oscs[oscIndex].osc.frequency.value = freq
 }
 const masterVol  = document.querySelector('#masterVol')
 masterVol.addEventListener('input', () => changeVolume(masterVol))
@@ -174,8 +187,14 @@ function sleep(ms) {
 function sin(x){
 	return Math.sin(x)
 }
+function tan(x){
+	return Math.tan(x)
+}
 function cos(x){
 	return Math.cos(x)
+}
+function floor(x){
+	return Math.floor(x)
 }
 function rand(){
 	return Math.random()
@@ -183,25 +202,40 @@ function rand(){
 function pow(a,b){
 	return Math.pow(a,b)
 }
+function max(a,b){
+	return Math.max(a,b)
+}
+function min(a,b){
+	return Math.min(a,b)
+}
+//clamps a between b and c
+function clamp(a,b,c){
+	high = max(b,c)
+	low = min(b,c)
+	return max(min(a,high),low)
+}
 
+let pitches = []
+let f = 0
 async function updateLoop() {
-	t += 1
-
+	t = audioCtx.currentTime
+	f++
 	// for (i in keyMap){
 	// 	if(keyMap[i].pressed){
 	// 		key = keyNoteMap[i]-9-24
 	// 	}
 	// }
 	// note = eval(noteEquation.value)
-	let pitches = []
+	pitches = []
 	for ( i in oscs ){
-		pitches.push(oscs[i][0].frequency.value)
+		pitches.push(oscs[i].osc.frequency.value)
 	}
 	for ( i in oscs ){
 		try {
-			let newPitch = eval(oscs[i][2])
-			oscs[i][0].frequency.value = newPitch
-			if(t%5 == 0)
+			let newPitch = oscs[i].freqFunction(note)
+			oscs[i].osc.frequency.setValueAtTime(newPitch, audioCtx.currentTime)
+			
+			if(f%5 == 0)
 				document.getElementById('osc'+i+'Container').querySelector('.pitchVal').innerText = newPitch
 		} catch (e) {}
 	}

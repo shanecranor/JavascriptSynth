@@ -8,14 +8,13 @@ A (mostly) fully featured synthesizer built using the webaudio API, check out th
 - Modular OSC pitch input field
   - Type in a specific frequency or use the 'note' variable to access the output of the note equation
   - t is a time based variable then increases by 1 every update cycle
-  - sin(x) and cos(x) does as expected (x is in radians I think)
+  - sin(x), cos(x), and tan(x) does as expected (x is in radians I think)
+  - floor(x) will round down
   - rand() will produce a random floating point number between 0 and 1
   - pitches[i] returns the pitch of the ith oscillator besides the current oscillator.
   - all operators work mostly as expected + - / * %
   - Javascript functions work like Math.tan()
-  
-## TODO
-- swap eval out with new Function for over 1000x performance speed up
+
 ## Potential Future Directions:
 
 //easy:
