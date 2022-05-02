@@ -20,5 +20,31 @@
 		press the keys on the home row of your keyboard to make sound! <br>
 		type 'note' in the freq equation to generate in tune notes. want to go up an octave? type note*2, want to add some vibrato? try note + sin(t)
 	</p>
+	<h3>Manual:</h3>
+
+	<h4>Functions and Attributes to type into text boxes</h4>
+	<ul>
+		<li>Basic Functions: +, -, *, /, %</li>
+		<li>Trig Functions: sin(x), cos(x), tan(x) </li>
+		<li>Misc functions:</li>
+			<ul>
+				<li>pow(a,b): returns a^b</li>
+				<li>rand(): returns random floating point number between 0 and 1</li>
+				<li>max(a,b), min(a,b): self explanatory</li>
+				<li>clamp(value, lowerBound, upperBound): constrains the value input between the lower and upper bounds</li>
+				<li>floor(x), ceil(x): rounds down or up to the nearest integer respectively</li>
+				<li>round(x): rounds to nearest integer </li>
+			</ul>
+		<li>Attributes (can be used in any text box)</li>
+			<ul>
+				<li>t: floating point time, probably in seconds?</li>
+				<li>f: integer cycles, less stable than time, increments around 100x faster (probably don't use this)</li>
+				<li>key: raw keyboard data converted to ints, only works for the home row, A->0 W->1 S->2 ... P->15</li>
+				<li>note: returns the value from the output of the Note Equation (to the right of the master volume) </li>
+				<li>pitches[i]: returns the ith pitch calculated by the frequency equation</li>
+				<li>amp[i]: returns the value of the ith amplitude slider with values between 0 and 1</li>
+				<li>ampPost[i]: returns the value of the ith volume level based on the amplitude equation also should be between 0 and 1</li>
+			</ul>
+	</ul>
 </body>
 </html> 

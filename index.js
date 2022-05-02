@@ -238,32 +238,18 @@ async function updateLoop() {
 
 updateLoop()
 
-//functions for use inside  the equations
+//functions for use inside  the equations so you don't need to type Math. everything (why javascript)
 
-function sin(x){
-	return Math.sin(x)
-}
-function tan(x){
-	return Math.tan(x)
-}
-function cos(x){
-	return Math.cos(x)
-}
-function floor(x){
-	return Math.floor(x)
-}
-function rand(){
-	return Math.random()
-}
-function pow(a,b){
-	return Math.pow(a,b)
-}
-function max(a,b){
-	return Math.max(a,b)
-}
-function min(a,b){
-	return Math.min(a,b)
-}
+function sin(x)  {	return Math.sin(x)	}
+function tan(x)  {	return Math.tan(x)	}
+function cos(x)  {	return Math.cos(x)	}
+function floor(x){	return Math.floor(x)}
+function ceil(x) {	return Math.floor(x)}
+function rand()  {	return Math.random()}
+function pow(a,b){	return Math.pow(a,b)}
+function max(a,b){	return Math.max(a,b)}
+function min(a,b){	return Math.min(a,b)}
+function round(x){  return Math.round(x)}
 //clamps a between b and c
 function clamp(a,b,c){
 	high = max(b,c)
