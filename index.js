@@ -80,8 +80,11 @@ let waveforms = {
 	3: 'square'
 }
 
-function generateFunction(string) {
+function generateNoteFunction(string) {
     return new Function("note", 'return ' + string)
+}
+function generateFunction(string) {
+    return new Function('return ' + string)
 }
 
 noteEquation = document.getElementById('noteEquation')
@@ -92,18 +95,18 @@ masterLevel.connect(audioCtx.destination)
 let oscs = []
 let key = 5
 let note = eval(noteEquation.value)
-createOsc(waveforms[3], 'note*2',	.2)
-createOsc(waveforms[3], 'note*4+sin(50*t)*4',	.2)
-createOsc(waveforms[3], 'note*(1+floor(t*8)%2)',	0.0)
-console.log(waveforms)
+createOsc(waveforms[3], 'note*2',					.2,	"amp["+oscs.length+"]")
+createOsc(waveforms[3], 'note*4+sin(50*t)*4',		.2,	"amp["+oscs.length+"]")
+createOsc(waveforms[3], 'note*(1+floor(t*8)%2)',	0.0,"amp["+oscs.length+"]*(1+floor(t*2)%2)")
 function createOsc(wave, freqEquation, gain, volEquation){
 	let volNode = audioCtx.createGain()
 	let oscNode = {
 		osc:			audioCtx.createOscillator(), 
 		vol:			volNode,
+		volSlider:		gain,
 		freqText:		freqEquation, 
-		freqFunction:	generateFunction(freqEquation),
-		volEquation: 	gain,
+		freqFunction:	generateNoteFunction(freqEquation),
+		volEquation: 	volEquation,
 		volFunction:	generateFunction(volEquation)
 	}
 	oscs.push(oscNode)
@@ -125,9 +128,9 @@ function createOsc(wave, freqEquation, gain, volEquation){
 		min: 0, max: 100, value: gain*100
 	})
 	let oscAmpVal = createElement('input', {
-		class: 'pitch',
+		class: 'ampVal',
  		type: 'text',
-		value: volEquation
+		value: oscs[oscs.length-1].volEquation
 	})
 	let oscType = createElement('input', {
 		class: 'type',
@@ -147,6 +150,9 @@ function createOsc(wave, freqEquation, gain, volEquation){
 	oscContainer.appendChild(oscLabel)
 	oscContainer.appendChild(oscAmp)
 	oscAmp.addEventListener('input', () => changeOscAmp(oscContainer))
+	oscContainer.appendChild(oscAmpVal)
+	oscAmpVal.addEventListener('input', () => changeOscAmpVal(oscContainer))
+	
 	
 	oscContainer.appendChild(oscType)
 	oscType.addEventListener('input', () => changeOscType(oscContainer))
@@ -167,7 +173,7 @@ const changeVolume = function(slider) {
 const changeOscAmp = function(container) {
 	slider = container.querySelector('.amplitude')
 	oscIndex = container.id[3]
-	oscs[oscIndex].vol.gain.value =  slider.value / 100
+	oscs[oscIndex].volSlider =  slider.value / 100
 }
 
 const changeOscType = function(container) {
@@ -181,9 +187,15 @@ const changeOscPitch = function(container) {
 	input = container.querySelector('.pitch')
 	oscIndex = container.id[3]
 	oscs[oscIndex].freqText = input.value
-	oscs[oscIndex].freqFunction = generateFunction(oscs[oscIndex].freqText)
+	oscs[oscIndex].freqFunction = generateNoteFunction(oscs[oscIndex].freqText)
 	} catch (e){}
-	//oscs[oscIndex].osc.frequency.value = freq
+}
+
+const changeOscAmpVal = function(container) {
+	input = container.querySelector('.ampVal')
+	oscIndex = container.id[3]
+	oscs[oscIndex].volEquation = input.value
+	oscs[oscIndex].volFunction = generateFunction(oscs[oscIndex].volEquation)
 }
 const masterVol  = document.querySelector('#masterVol')
 masterVol.addEventListener('input', () => changeVolume(masterVol))
@@ -195,21 +207,29 @@ function sleep(ms) {
 }
 // funky timer debugging shit note*1*(t*97.5-(f*1.5))
 let pitches = []
+let amp = []
+let ampPost = []
 let f = 0
 async function updateLoop() {
 	t = audioCtx.currentTime
 	f++
+	//TODO: reseting pitches and amp arrays every cycle is probably slow... but whatver
 	pitches = []
+	ampPost = []
+	amp = []
 	for ( i in oscs ){
 		pitches.push(oscs[i].osc.frequency.value)
+		ampPost.push(oscs[i].vol.gain.value)
+		amp.push(oscs[i].volSlider)
 	}
 	for ( i in oscs ){
 		try {
 			let newPitch = oscs[i].freqFunction(note)
 			oscs[i].osc.frequency.setValueAtTime(newPitch, t)
-			
-			if(f%5 == 0)
+			if(f%10 == 0)
 				document.getElementById('osc'+i+'Container').querySelector('.pitchVal').innerText = newPitch
+			let newVol = oscs[i].volFunction()
+			oscs[i].vol.gain.setValueAtTime(newVol, t)
 		} catch (e) {}
 	}
 	await sleep(10)

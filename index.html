@@ -11,9 +11,9 @@
 	Note Equation
 	<input id="noteEquation" type="text"/>
 	<div id="oscControls">
-		<p>OSC | ------AMPLITUDE------ | ------WAVEFORM------ |-FREQ EQUATION- | FREQ DISPLAY</p>
+		<p>OSC | ------AMPLITUDE------ | --AMPLITUDE EQUATION-- | ------WAVEFORM------ |-FREQ EQUATION- | FREQ DISPLAY</p>
 	</div>
-	<button onclick="createOsc(waveforms[0], 'note',	.2)" >New OSC</button>
+	<button onclick="createOsc(waveforms[0], 'note',	.2, 'amp['+oscs.length+']')" >New OSC</button>
 	<script type="text/javascript" src="index.js"></script>
 	<h3>Instructions:</h3>
 	<p>
