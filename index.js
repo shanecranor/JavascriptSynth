@@ -3,7 +3,7 @@ function keyPress(e, isPressed){
 }
 function triggerOscs(e){
 	key = keyNoteMap[e.key]-9-24
-	note = eval(noteEquation.value)
+	note = eval(noteEquationValue)
 	for ( i in oscs ){
 		if(!audioStarted){
 			oscs[i].osc.start()
@@ -45,7 +45,7 @@ document.onkeyup = (e) => {
 	}
 	if(anyPressed){
 		key = keyNoteMap[mostRecentKey]-9-24
-		note = eval(noteEquation.value)
+		note = eval(noteEquationValue)
 	}else {
 		for ( i in oscs ){
 			oscs[i].osc.disconnect()
@@ -74,7 +74,7 @@ const changeOscType = function(container) {
 
 const changeOscPitch = function(container) {
 	try {
-	input = container.querySelector('.pitch')
+	const input = container.querySelector('.pitch')
 	oscIndex = container.id[3]
 	oscs[oscIndex].freqText = input.value
 	oscs[oscIndex].freqFunction = generateNoteFunction(oscs[oscIndex].freqText)
@@ -87,13 +87,24 @@ const changeOscPitch = function(container) {
 
 const changeOscAmpVal = function(container) {
 	try{
-		input = container.querySelector('.ampVal')
+		const input = container.querySelector('.ampVal')
 		oscIndex = container.id[3]
 		oscs[oscIndex].volEquation = input.value
 		oscs[oscIndex].volFunction = generateFunction(oscs[oscIndex].volEquation)
 		container.querySelector('.pitch').style.backgroundColor = 'black'
 	} catch (e){
 		container.querySelector('.ampVal').style.backgroundColor = 'red'
+	}
+}
+
+const changeNoteEquation = function(container){
+	try {
+		const input = container
+		noteEquationValue = input.value
+		note = eval(noteEquationValue)
+		container.style.backgroundColor = 'black'
+	} catch (e){
+		container.style.backgroundColor = 'red'
 	}
 }
 

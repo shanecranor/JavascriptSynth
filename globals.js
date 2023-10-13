@@ -4,6 +4,8 @@ let audioStarted = false
 //html elements 
 const noteEquation = document.getElementById('noteEquation')
 noteEquation.value = '440*pow(pow(2, 1/12), key)'
+let noteEquationValue = noteEquation.value
+noteEquation.addEventListener('input', () => changeNoteEquation(noteEquation))
 
 const masterVol  = document.querySelector('#masterVol')
 masterVol.addEventListener('input', () => changeVolume(masterVol))
