@@ -1,91 +1,60 @@
-keyMap = new Object()
 let audioStarted = false
 let t = 0
-document.onkeydown = function (e) {
-	if(keyNoteMap[e.key] == null)
-		return
-	if(!keyMap[e.key] || !keyMap[e.key].pressed){
-    	keyMap[e.key] = {pressed: true, time: performance.now()}
-		key = keyNoteMap[e.key]-9-24
-		note = eval(noteEquation.value)
-		for ( i in oscs ){
-			if(!audioStarted){
-				oscs[i].osc.start()
-			}
-			let newPitch = oscs[i].freqFunction(note)
-			oscs[i].osc.frequency.setValueAtTime(newPitch, audioCtx.currentTime)
-			oscs[i].osc.connect(oscs[i].vol)
+function keyPress(e, isPressed){
+	keyMap[e.key] =  {pressed: isPressed, time: performance.now()}
+}
+function triggerOscs(e){
+	key = keyNoteMap[e.key]-9-24
+	note = eval(noteEquation.value)
+	for ( i in oscs ){
+		if(!audioStarted){
+			oscs[i].osc.start()
 		}
-		audioStarted = true
+		let newPitch = oscs[i].freqFunction(note)
+		oscs[i].osc.frequency.setValueAtTime(newPitch, audioCtx.currentTime)
+		oscs[i].osc.connect(oscs[i].vol)
+	}
+	audioStarted = true
+}
+
+document.onkeydown = (e) => {
+	if(keyNoteMap[e.key] == null) return
+	if(!keyMap[e.key] || !keyMap[e.key].pressed){
+		keyPress(e, true)
+		triggerOscs(e)
 	}
 }
 
-document.onkeyup = function (e) {
-	if(keyNoteMap[e.key] == null)
-		return
-    keyMap[e.key] = {pressed: false, time: performance.now()}
+document.onkeyup = (e) => {
+	if(keyNoteMap[e.key] == null) return
+	keyPress(e, false)
 	let keysDown = 0
 	for ( key in keyMap ){
 		if(keyMap[key].pressed){
 			keysDown+=1
 		}
 	}
-	if (keysDown == 0){
+	//loop through the keymap and check to see the most recently pressed key, then trigger that osc
+	let mostRecent = 0
+	let mostRecentKey = ''
+	let anyPressed = false
+	for ( key in keyMap ){
+		if(keyMap[key].pressed && keyMap[key].time > mostRecent){
+			mostRecent = keyMap[key].time
+			mostRecentKey = key
+			anyPressed = true
+		}
+	}
+	if(anyPressed){
+		key = keyNoteMap[mostRecentKey]-9-24
+		note = eval(noteEquation.value)
+	}else {
 		for ( i in oscs ){
 			oscs[i].osc.disconnect()
 		}
 	}
 }
 
-keyNoteMap = {
-	'q':	-1,
-	'a':	0,
-	'w':	1,
-	's':	2,
-	'e':	3,
-	'd':	4,
-	'f':	5,
-	't':	6,
-	'g' :	7,
-	'y' :	8,
-	'h' :	9,
-	'u' :	10,
-	'j' :	11,
-	'k' :	12,
-	'o' :	13,
-	'l' :	14,
-	'p' :	15,
-	';' :	16,
-	"'" :	17,
-	']' :	18,
-	'Enter':19
-}
-
-//https://stackoverflow.com/questions/12274748/setting-multiple-attributes-for-an-element-at-once-with-javascript
-function setAttributes(element, attributes) {
-	Object.keys(attributes).forEach(attr => {
-	  element.setAttribute(attr, attributes[attr])
-	})
-}
-function createElement(tag, attributes) {
-	let elem = document.createElement(tag)
-	setAttributes(elem, attributes)
-	return elem
-}
-
-let waveforms = {
-	0: 'sine',
-	1: 'triangle',
-	2: 'sawtooth',
-	3: 'square'
-}
-
-function generateNoteFunction(string) {
-    return new Function("note", 'return ' + string)
-}
-function generateFunction(string) {
-    return new Function('return ' + string)
-}
 
 noteEquation = document.getElementById('noteEquation')
 noteEquation.value = '440*pow(pow(2, 1/12), key)'
@@ -98,72 +67,7 @@ let note = eval(noteEquation.value)
 createOsc(waveforms[3], 'note*2',					.2,	"amp["+oscs.length+"]")
 createOsc(waveforms[3], 'note*4+sin(50*t)*4',		.2,	"amp["+oscs.length+"]")
 createOsc(waveforms[3], 'note*(1+floor(t*8)%2)',	0.0,"amp["+oscs.length+"]*(1+floor(t*2)%2)")
-function createOsc(wave, freqEquation, gain, volEquation){
-	let volNode = audioCtx.createGain()
-	let oscNode = {
-		osc:			audioCtx.createOscillator(), 
-		vol:			volNode,
-		volSlider:		gain,
-		freqText:		freqEquation, 
-		freqFunction:	generateNoteFunction(freqEquation),
-		volEquation: 	volEquation,
-		volFunction:	generateFunction(volEquation)
-	}
-	oscs.push(oscNode)
-	oscs[oscs.length-1].osc.type = wave
-	oscs[oscs.length-1].osc.frequency.value = oscs[oscs.length-1].freqFunction(note)
-	//oscs[oscs.length-1].osc.connect(oscs[oscs.length-1].vol)
-	oscs[oscs.length-1].vol.gain.value = gain
-	oscs[oscs.length-1].vol.connect(masterLevel)
-	let oscContainer = createElement('div', {
-		id: 'osc' + (oscs.length-1) + 'Container'
-	})
-	let oscLabel = createElement('p', {
-		class: 'oscLabel',
-		style: 'display: inline; padding-right: 10px;'
-	})
-	let oscAmp = createElement('input', {
-		class: 'amplitude',
- 		type: 'range',
-		min: 0, max: 100, value: gain*100
-	})
-	let oscAmpVal = createElement('input', {
-		class: 'ampVal',
- 		type: 'text',
-		value: oscs[oscs.length-1].volEquation
-	})
-	let oscType = createElement('input', {
-		class: 'type',
- 		type: 'range',
-		min: 0, max: 3, value: 3
-	})
-	let oscPitch = createElement('input', {
-		class: 'pitch',
- 		type: 'text',
-		value: freqEquation
-	})
-	let oscPitchVal = createElement('p', {
-		class: 'pitchVal',
-		style: 'display: inline; padding-left: 10px;'
-	})
-	oscLabel.innerText = 'osc' + (oscs.length-1)
-	oscContainer.appendChild(oscLabel)
-	oscContainer.appendChild(oscAmp)
-	oscAmp.addEventListener('input', () => changeOscAmp(oscContainer))
-	oscContainer.appendChild(oscAmpVal)
-	oscAmpVal.addEventListener('input', () => changeOscAmpVal(oscContainer))
-	
-	
-	oscContainer.appendChild(oscType)
-	oscType.addEventListener('input', () => changeOscType(oscContainer))
-	
-	oscContainer.appendChild(oscPitch)
-	oscPitch.addEventListener('input', () => changeOscPitch(oscContainer))
 
-	oscPitchVal.innerText = oscs[oscs.length-1].osc.frequency.value
-	oscContainer.appendChild(oscPitchVal)
-	document.getElementById('oscControls').appendChild(oscContainer)
-}
 
 const changeVolume = function(slider) {
 	const value = slider.value / 100
