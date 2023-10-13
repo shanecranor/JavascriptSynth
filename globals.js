@@ -37,6 +37,7 @@ async function updateLoop() {
 		try {
 			let newPitch = oscs[i].freqFunction(note)
 			oscs[i].osc.frequency.setValueAtTime(newPitch, t)
+            //update the pitch display every 10 frames
 			if(f%10 == 0)
 				document.getElementById('osc'+i+'Container').querySelector('.pitchVal').innerText = newPitch
 			let newVol = oscs[i].volFunction()

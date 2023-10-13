@@ -20,7 +20,7 @@ function createOsc(wave, freqEquation, gain, volEquation){
 	//oscs[oscs.length-1].osc.connect(oscs[oscs.length-1].vol)
 	oscs[oscs.length-1].vol.gain.value = gain
 	oscs[oscs.length-1].vol.connect(masterLevel)
-	let oscContainer = createElement('div', {
+	let oscContainer = createElement('tr', {
 		id: 'osc' + (oscs.length-1) + 'Container'
 	})
 	let oscLabel = createElement('p', {
@@ -52,20 +52,21 @@ function createOsc(wave, freqEquation, gain, volEquation){
 		style: 'display: inline; padding-left: 10px;'
 	})
 	oscLabel.innerText = 'osc' + (oscs.length-1)
-	oscContainer.appendChild(oscLabel)
-	oscContainer.appendChild(oscAmp)
-	oscAmp.addEventListener('input', () => changeOscAmp(oscContainer))
-	oscContainer.appendChild(oscAmpVal)
+    const td = (child) => {
+        const el = createElement('td', {})
+        el.appendChild(child)
+        return el;
+    }
+    oscAmp.addEventListener('input', () => changeOscAmp(oscContainer))
 	oscAmpVal.addEventListener('input', () => changeOscAmpVal(oscContainer))
-	
-	
-	oscContainer.appendChild(oscType)
 	oscType.addEventListener('input', () => changeOscType(oscContainer))
-	
-	oscContainer.appendChild(oscPitch)
 	oscPitch.addEventListener('input', () => changeOscPitch(oscContainer))
 
 	oscPitchVal.innerText = oscs[oscs.length-1].osc.frequency.value
-	oscContainer.appendChild(oscPitchVal)
-	document.getElementById('oscControls').appendChild(oscContainer)
+    const appendList = [oscLabel, oscAmp, oscAmpVal, oscType, oscPitch, oscPitchVal]
+    appendList.forEach(el => {
+        oscContainer.appendChild(td(el))
+    })
+
+    document.getElementById('oscControls').appendChild(oscContainer)
 }
