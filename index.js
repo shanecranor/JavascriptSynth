@@ -78,14 +78,23 @@ const changeOscPitch = function(container) {
 	oscIndex = container.id[3]
 	oscs[oscIndex].freqText = input.value
 	oscs[oscIndex].freqFunction = generateNoteFunction(oscs[oscIndex].freqText)
-	} catch (e){}
+	container.querySelector('.pitch').style.backgroundColor = 'black'
+
+	} catch (e){
+		container.querySelector('.pitch').style.backgroundColor = 'red'
+	}
 }
 
 const changeOscAmpVal = function(container) {
-	input = container.querySelector('.ampVal')
-	oscIndex = container.id[3]
-	oscs[oscIndex].volEquation = input.value
-	oscs[oscIndex].volFunction = generateFunction(oscs[oscIndex].volEquation)
+	try{
+		input = container.querySelector('.ampVal')
+		oscIndex = container.id[3]
+		oscs[oscIndex].volEquation = input.value
+		oscs[oscIndex].volFunction = generateFunction(oscs[oscIndex].volEquation)
+		container.querySelector('.pitch').style.backgroundColor = 'black'
+	} catch (e){
+		container.querySelector('.ampVal').style.backgroundColor = 'red'
+	}
 }
 
 // pitch.addEventListener('input', () => changePitch(pitch.value))
