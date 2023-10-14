@@ -1,6 +1,10 @@
 function newDefaultOsc(){
     createOsc(waveforms[3], 'note*(1+floor(t*8)%2)',	0.0,"amp["+oscs.length+"]*(1+floor(t*2)%2)")
+    try{
     oscs[oscs.length - 1].osc.start()
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 function createOsc(wave, freqEquation, gain, volEquation){

@@ -94,7 +94,7 @@ const changeOscAmpVal = function(container) {
 		oscIndex = container.id.split("-")[1]
 		oscs[oscIndex].volEquation = input.value
 		oscs[oscIndex].volFunction = generateFunction(oscs[oscIndex].volEquation)
-		container.querySelector('.pitch').style.backgroundColor = 'black'
+		container.querySelector('.ampVal').style.backgroundColor = 'black'
 	} catch (e){
 		container.querySelector('.ampVal').style.backgroundColor = 'red'
 		console.error(e)
