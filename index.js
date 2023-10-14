@@ -1,5 +1,3 @@
-
-
 function keyPress(e, isPressed){
 	keyMap[e.key] =  {pressed: isPressed, time: performance.now()}
 }
@@ -19,6 +17,7 @@ function triggerOscs(e){
 
 document.onkeydown = (e) => {
 	if(keyNoteMap[e.key] == null) return
+	if(e.key == "'" || e.key == "enter") e.preventDefault();
 	if(!keyMap[e.key] || !keyMap[e.key].pressed){
 		keyPress(e, true)
 		triggerOscs(e)
