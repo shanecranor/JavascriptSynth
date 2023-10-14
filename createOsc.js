@@ -1,18 +1,19 @@
 function newDefaultOsc(){
     createOsc(waveforms[3], 'note*(1+floor(t*8)%2)',	0.0,"amp["+oscs.length+"]*(1+floor(t*2)%2)")
     oscs[oscs.length - 1].osc.start()
-
 }
+
 function createOsc(wave, freqEquation, gain, volEquation){
 	let volNode = audioCtx.createGain()
 	let oscNode = {
-		osc:			audioCtx.createOscillator(), 
-		vol:			volNode,
-		volSlider:		gain,
-		freqText:		freqEquation, 
-		freqFunction:	generateNoteFunction(freqEquation),
-		volEquation: 	volEquation,
-		volFunction:	generateFunction(volEquation)
+		osc:			    audioCtx.createOscillator(), 
+		vol:			    volNode,
+		volSlider:		    gain,
+		freqText:		    freqEquation, 
+		freqFunction:	    generateNoteFunction(freqEquation),
+        freqHistory:        [],
+		volEquation: 	    volEquation,
+		volFunction:	    generateFunction(volEquation)
 	}
 	oscs.push(oscNode)
 	oscs[oscs.length-1].osc.type = wave
@@ -51,6 +52,7 @@ function createOsc(wave, freqEquation, gain, volEquation){
 		class: 'pitchVal',
 		style: 'display: inline; padding-left: 10px;'
 	})
+    const freqGraph = createElement('canvas', { id: 'freqGraph' + (oscs.length-1), width: 100, height: 20 })
 	oscLabel.innerText = 'osc' + (oscs.length-1)
     const td = (child) => {
         const el = createElement('td', {})
@@ -63,7 +65,7 @@ function createOsc(wave, freqEquation, gain, volEquation){
 	oscPitch.addEventListener('input', () => changeOscPitch(oscContainer))
 
 	oscPitchVal.innerText = oscs[oscs.length-1].osc.frequency.value
-    const appendList = [oscLabel, oscAmp, oscAmpVal, oscType, oscPitch, oscPitchVal]
+    const appendList = [oscLabel, oscAmp, oscAmpVal, oscType, oscPitch, oscPitchVal, freqGraph]
     appendList.forEach(el => {
         oscContainer.appendChild(td(el))
     })

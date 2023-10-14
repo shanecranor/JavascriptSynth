@@ -40,8 +40,17 @@ async function updateLoop() {
 			let newPitch = oscs[i].freqFunction(note)
 			oscs[i].osc.frequency.setValueAtTime(newPitch, t)
             //update the pitch display every 10 frames
+            //round pitch to nearest 10th but ensure consistant string length
+            //eg 440.0 instead of 440
 			if(f%10 == 0)
-				document.getElementById('osc'+i+'Container').querySelector('.pitchVal').innerText = newPitch
+				document.getElementById('osc'+i+'Container').querySelector('.pitchVal').innerText = newPitch.toFixed( 1)
+
+            if(true){
+                oscs[i].freqHistory.push(newPitch)
+                if(oscs[i].freqHistory.length > 100)
+                    oscs[i].freqHistory.shift()
+                updateFreqGraph(oscs[i].freqHistory, i)
+            }
 			let newVol = oscs[i].volFunction()
 			oscs[i].vol.gain.setValueAtTime(newVol, t)
 		} catch (e) {}

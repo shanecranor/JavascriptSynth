@@ -1,3 +1,5 @@
+
+
 function keyPress(e, isPressed){
 	keyMap[e.key] =  {pressed: isPressed, time: performance.now()}
 }
@@ -106,6 +108,23 @@ const changeNoteEquation = function(container){
 	} catch (e){
 		container.style.backgroundColor = 'red'
 	}
+}
+
+function updateFreqGraph(history, oscIndex){
+    const minVal = Math.min(...history)
+    const maxVal = Math.max(...history)
+	let canvas = document.querySelector('#freqGraph' + oscIndex)
+	let ctx = canvas.getContext('2d')
+	ctx.clearRect(0, 0, canvas.width, canvas.height)
+// set stroke to blue
+    ctx.strokeStyle = 'blue'
+	ctx.beginPath()
+	ctx.moveTo(0, canvas.height - (history[0] - minVal) / (maxVal - minVal) * canvas.height || 0)
+
+	for ( i in history ){
+		ctx.lineTo(i, canvas.height - (history[i] - minVal) / (maxVal - minVal) * canvas.height || 0)
+	}
+	ctx.stroke()
 }
 
 // pitch.addEventListener('input', () => changePitch(pitch.value))
