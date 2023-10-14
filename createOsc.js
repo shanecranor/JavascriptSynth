@@ -15,14 +15,13 @@ function createOsc(wave, freqEquation, gain, volEquation){
 		volEquation: 	    volEquation,
 		volFunction:	    generateFunction(volEquation)
 	}
-	oscs.push(oscNode)
-	oscs[oscs.length-1].osc.type = wave
-	oscs[oscs.length-1].osc.frequency.value = oscs[oscs.length-1].freqFunction(note)
+	oscNode.osc.type = wave
+	oscNode.osc.frequency.value = oscNode.freqFunction(note)
 	//oscs[oscs.length-1].osc.connect(oscs[oscs.length-1].vol)
-	oscs[oscs.length-1].vol.gain.value = gain
-	oscs[oscs.length-1].vol.connect(masterLevel)
+	oscNode.vol.gain.value = gain
+	oscNode.vol.connect(masterLevel)
 	let oscContainer = createElement('tr', {
-		id: 'osc' + (oscs.length-1) + 'Container'
+		id: `osc-${oscs.length}-container`,
 	})
 	let oscLabel = createElement('p', {
 		class: 'oscLabel',
@@ -36,7 +35,7 @@ function createOsc(wave, freqEquation, gain, volEquation){
 	let oscAmpVal = createElement('input', {
 		class: 'ampVal',
  		type: 'text',
-		value: oscs[oscs.length-1].volEquation
+		value: oscNode.volEquation
 	})
 	let oscType = createElement('input', {
 		class: 'type',
@@ -52,8 +51,9 @@ function createOsc(wave, freqEquation, gain, volEquation){
 		class: 'pitchVal',
 		style: 'display: inline; padding-left: 10px;'
 	})
-    const freqGraph = createElement('canvas', { id: 'freqGraph' + (oscs.length-1), width: 100, height: 20 })
-	oscLabel.innerText = 'osc' + (oscs.length-1)
+    const freqGraph = createElement('canvas', { id: `freqGraph-${oscs.length}`, width: 100, height: 20 })
+    oscNode.freqCanvas = freqGraph
+	oscLabel.innerText = 'osc' + (oscs.length)
     const td = (child) => {
         const el = createElement('td', {})
         el.appendChild(child)
@@ -64,11 +64,13 @@ function createOsc(wave, freqEquation, gain, volEquation){
 	oscType.addEventListener('input', () => changeOscType(oscContainer))
 	oscPitch.addEventListener('input', () => changeOscPitch(oscContainer))
 
-	oscPitchVal.innerText = oscs[oscs.length-1].osc.frequency.value
+	oscPitchVal.innerText = oscNode.osc.frequency.value
     const appendList = [oscLabel, oscAmp, oscAmpVal, oscType, oscPitch, oscPitchVal, freqGraph]
     appendList.forEach(el => {
         oscContainer.appendChild(td(el))
     })
+    oscs.push(oscNode)
 
     document.getElementById('oscControls').appendChild(oscContainer)
+    oscNode.containerEl = oscContainer
 }

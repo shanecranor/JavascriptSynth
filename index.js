@@ -64,38 +64,41 @@ const changeVolume = function(slider) {
 
 const changeOscAmp = function(container) {
 	slider = container.querySelector('.amplitude')
-	oscIndex = container.id[3]
+	oscIndex = container.id.split("-")[1]
 	oscs[oscIndex].volSlider =  slider.value / 100
 }
 
 const changeOscType = function(container) {
 	slider = container.querySelector('.type')
-	oscIndex = container.id[3]
+	oscIndex = container.id.split("-")[1]
 	oscs[oscIndex].osc.type =  waveforms[slider.value]
 }
 
 const changeOscPitch = function(container) {
 	try {
 	const input = container.querySelector('.pitch')
-	oscIndex = container.id[3]
+	oscIndex = container.id.split("-")[1]
 	oscs[oscIndex].freqText = input.value
 	oscs[oscIndex].freqFunction = generateNoteFunction(oscs[oscIndex].freqText)
 	container.querySelector('.pitch').style.backgroundColor = 'black'
 
 	} catch (e){
 		container.querySelector('.pitch').style.backgroundColor = 'red'
+		console.error(e)
+
 	}
 }
 
 const changeOscAmpVal = function(container) {
 	try{
 		const input = container.querySelector('.ampVal')
-		oscIndex = container.id[3]
+		oscIndex = container.id.split("-")[1]
 		oscs[oscIndex].volEquation = input.value
 		oscs[oscIndex].volFunction = generateFunction(oscs[oscIndex].volEquation)
 		container.querySelector('.pitch').style.backgroundColor = 'black'
 	} catch (e){
 		container.querySelector('.ampVal').style.backgroundColor = 'red'
+		console.error(e)
 	}
 }
 
@@ -113,7 +116,7 @@ const changeNoteEquation = function(container){
 function updateFreqGraph(history, oscIndex){
     const minVal = Math.min(...history)
     const maxVal = Math.max(...history)
-	let canvas = document.querySelector('#freqGraph' + oscIndex)
+	let canvas = oscs[oscIndex].freqCanvas 
 	let ctx = canvas.getContext('2d')
 	ctx.clearRect(0, 0, canvas.width, canvas.height)
 // set stroke to blue
